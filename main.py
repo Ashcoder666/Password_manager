@@ -31,13 +31,6 @@ kdf = PBKDF2HMAC(
 key = base64.urlsafe_b64encode(kdf.derive(master_pwd.encode()))
 fernet = Fernet(key)
 
-# def load_key():
-#      return Fernet.generate_key()
-
-
-# load_key()
-    
-
 
 def write_password(a,b,c):
 
@@ -51,9 +44,16 @@ def write_password(a,b,c):
 def read_password():
     with open('passwords.txt',"r") as file:
         for line in file:
-            line = line.strip()
-            a,b,c = line.split("|")
-            print(f"Account: {a} , Username: {b} , Password: {c}")
+            
+            a,b,c = line.strip().split("|")
+
+            try:
+                decrypted_password = fernet.decrypt(c.encode()).decode()
+            except InvalidToken:
+                decrypted_password = "Invalid Master Password"
+
+
+            print(f"Account: {a} , Username: {b} , Password: {decrypted_password}")
 
 while True:
     option = input("Please Specify Your Action (READ , WRITE) Enter Q to Exit : ").lower()
